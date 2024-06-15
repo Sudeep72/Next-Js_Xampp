@@ -125,7 +125,7 @@ function Details() {
         <table className="table">
           <thead>
             <tr>
-              <th className="text-center text-base">ID</th>
+              {/* <th className="text-center text-base">ID</th> */}
               <th className="text-center text-base">Name</th>
               <th className="text-center text-base">Address</th>
               <th className="text-center text-base">Business</th>
@@ -138,7 +138,7 @@ function Details() {
           <tbody>
             {invoiceDetails.map((invoice, index) => (
               <tr key={index} className={index % 2 === 0 ? "" : "hover"}>
-                <th className="text-center">{invoice.id}</th>
+                {/* <th className="text-center">{invoice.id}</th> */}
                 <td className="text-center">{invoice.name}</td>
                 <td className="text-center">{invoice.address}</td>
                 <td className="text-center">{invoice.business}</td>

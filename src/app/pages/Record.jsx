@@ -67,64 +67,72 @@ function Record() {
       MarketValue,
       total,
     } = record;
-
+  
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-
+  
     // Draw border
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
-
-    // Add title and other text
-    doc.setFontSize(20);
-    doc.text("Invoice", 14, 22);
-
-    // Invoice Details
-    doc.setFontSize(12);
-    doc.text(`Invoice No: IOX${id}`, 14, 32);
-    doc.text(`Date: ${date}`, 14, 38);
-    doc.text(`GST Number: ${gstNumber}`, 14, 44);
-
-    // Pay To
-    doc.text("Pay To:", 14, 64);
-    doc.text(name + ",", 14, 70);
-    doc.text(address, 14, 76);
-
-    // Table Content
-    const tableData = [
-      ["Business", "Stocks", "Market Value", "Total"],
-      [business, stocks, `$${MarketValue}`, `$${stocks * MarketValue}`],
-    ];
-
-    // Generate table
-    doc.autoTable({
-      startY: 90,
-      head: [tableData[0]],
-      body: tableData.slice(1),
-      theme: "grid",
-    });
-
-    // Subtotal, SGST, CGST, Total
-    const finalY = doc.autoTable.previous.finalY;
-
+  
+    // Title
+    doc.setFontSize(14);
+    doc.text("GST INVOICE", pageWidth / 2, 15, { align: 'center' });
+  
+    // Receiver details
     doc.setFontSize(10);
-    doc.text(`SUBTOTAL: $${stocks * MarketValue}`, 140, finalY + 10);
-    doc.text(`SGST: $${sgst}`, 140, finalY + 16);
-    doc.text(`CGST: $${cgst}`, 140, finalY + 22);
-    doc.text(`TOTAL: $${total}`, 140, finalY + 28);
-
+    doc.text("Details of Receiver / Billed To:", 14, 25);
+    doc.text(`Name: ${name}`, 14, 30);
+    doc.text(`Address: ${address}`, 14, 35);
+    doc.text(`GSTIN / UIN: ${gstNumber}`, 14, 40);
+  
+    // Invoice and Date
+    doc.text(`Invoice No: ${id}`, pageWidth - 60, 25);
+    doc.text(`Date: ${date}`, pageWidth - 60, 30);
+  
+    // Product details table
+    doc.autoTable({
+      startY: 45,
+      head: [['Sl No.', 'Name of the Product / Service', 'HSN Code', 'Qty in KG', 'Rate / kg', 'Amount']],
+      body: [
+        [1, business, '', stocks, MarketValue, (stocks * MarketValue).toFixed(2)],
+        // Add more rows if needed
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
+      styles: { fontSize: 10, cellPadding: 2 },
+    });
+  
+    const finalY = doc.autoTable.previous.finalY;
+  
+    // Additional details
+    doc.text(`Subtotal: $${(stocks * MarketValue).toFixed(2)}`, 14, finalY + 10);
+    doc.text(`Add CGST @ 2.5%: $${cgst}`, 14, finalY + 16);
+    doc.text(`Add SGST @ 2.5%: $${sgst}`, 14, finalY + 22);
+    doc.text(`Total Amount After Tax: $${total}`, 14, finalY + 28);
+  
+    // Terms & Conditions
+    doc.text("Terms & Conditions", 14, finalY + 40);
+    doc.text("1) Goods cannot be taken back.", 14, finalY + 45);
+    doc.text("2) Our responsibility ceases once the goods leave our premises.", 14, finalY + 50);
+    doc.text("3) Payment term shall be within 10 days, failing which attracts 2% monthly interest.", 14, finalY + 55);
+  
     // Footer
-    doc.text("Thank you for your business!", 14, finalY + 40);
-
+    doc.text("Thank you for your business!", 14, finalY + 70);
+    doc.text("Prepared by: ____________________", 14, finalY + 80);
+    doc.text("Checked by: _____________________", 14, finalY + 85);
+    doc.text("Authorised Signatory: ____________", 14, finalY + 90);
+  
     doc.save(`invoice_IOX${id}.pdf`);
-
+  
     setToast({
       message: "Invoice downloaded successfully!",
       type: "alert-success",
     });
   };
+  
 
   const handleToastClose = () => {
     setToast({});
